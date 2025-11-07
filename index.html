@@ -16,7 +16,7 @@
 
   <style>
     :root{
-      /* Paleta principal (se mantiene) */
+      /* Paleta (se mantiene) */
       --rose:#ff3e8a;
       --rose-2:#ff69a6;
       --rose-soft:#ffc2d9;
@@ -46,25 +46,48 @@
 
     main{ flex-shrink:0; }
 
-    /* Navbar */
+    /* Navbar centrada */
     .navbar{
       background: linear-gradient(90deg, var(--ink) 0%, #111117 60%, #13131a 100%);
       border-bottom:1px solid var(--border);
     }
+    .navbar .container{
+      display:flex;
+      justify-content:center; /* centra el branding */
+    }
     .navbar .navbar-brand{
       color:#fff;
-      font-weight:700;
-      letter-spacing:.4px;
-      display:flex;
+      font-weight:800;
+      letter-spacing:.5px;
+      display:inline-flex;
       align-items:center;
-      gap:.5rem;
+      gap:.75rem;
       text-transform:uppercase;
+      padding:.6rem 1rem;
+      border-radius:1rem;
+      background: rgba(255,62,138,.08);
+      border:1px solid rgba(255,62,138,.25);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      text-decoration:none;
+      transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
     }
-    .navbar .navbar-brand i{
-      color:var(--rose);
-      filter: drop-shadow(0 0 6px rgba(255,62,138,.4));
+    .navbar .navbar-brand:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(255,62,138,.25);
+      border-color: rgba(255,62,138,.35);
     }
-    .navbar .navbar-brand:hover{ color:#fff; }
+
+    /* Logo calculadora (SVG) interacciones */
+    .logo-calc{
+      width:28px; height:28px; flex:0 0 28px;
+      filter: drop-shadow(0 0 6px rgba(255,62,138,.35));
+    }
+    .logo-body{ fill:url(#gRose); }
+    .logo-screen{ fill:#0a0a0e; }
+    .logo-key{ fill:#1c1c24; transition: fill .25s ease, transform .25s ease; }
+    .navbar .navbar-brand:hover .logo-key{ fill:#2a2a31; }
+    .logo-key.hl{ fill:#2a2a31; }
+    .navbar .navbar-brand:hover .logo-key.hl{ transform: translateY(-1px); fill:#3a3a45; }
 
     /* Hero centrado */
     .hero-wrap{
@@ -78,7 +101,6 @@
       -webkit-background-clip:text;
       background-clip:text;
       color:transparent;
-      text-shadow: 0 0 0 transparent;
       animation: softGlow 5s ease-in-out infinite;
     }
     .hero-sub{
@@ -120,7 +142,7 @@
       transform: translateY(-1px);
     }
 
-    /* Botón primario (rosa) */
+    /* Botón primario (rosa) + ripple */
     .btn-primary{
       --bs-btn-color:#0b0b0f;
       --bs-btn-bg:var(--rose);
@@ -131,10 +153,12 @@
       --bs-btn-active-bg:#ff2f83;
       --bs-btn-active-border-color:#ff2f83;
       border-radius: 1rem;
-      font-weight:700;
+      font-weight:800;
       letter-spacing:.4px;
       text-transform:uppercase;
       box-shadow: 0 8px 20px rgba(255,62,138,.28);
+      position:relative;
+      overflow:hidden;
       transition: transform .08s ease, box-shadow .2s ease;
     }
     .btn-primary:hover{
@@ -142,9 +166,15 @@
       box-shadow: 0 10px 24px rgba(255,62,138,.35);
       color:#0a0a0e;
     }
-    .btn-primary:active{
-      transform: translateY(0);
-      box-shadow: 0 4px 12px rgba(255,62,138,.25);
+    .btn-primary:active::after{
+      content:"";
+      position:absolute; inset:auto;
+      left:50%; top:50%;
+      width:10px; height:10px; border-radius:50%;
+      background: rgba(255,62,138,.45);
+      transform: translate(-50%,-50%) scale(1);
+      animation: ripple .5s ease-out forwards;
+      pointer-events:none;
     }
 
     /* Alerts reestilizadas */
@@ -174,41 +204,57 @@
       border-top:1px solid var(--border);
       color:#bcbccd;
     }
-    .footer a{ color:var(--rose-2); text-decoration:none; }
-    .footer a:hover{ text-decoration:underline; }
-
-    /* Detalles */
-    .brand-accent{
-      display:inline-flex; align-items:center; gap:.5rem;
-      padding:.5rem .75rem; border-radius:.75rem;
-      background: rgba(255,62,138,.08);
-      border:1px solid rgba(255,62,138,.25);
-      color:#fff;
-    }
-    .brand-accent i{ color:var(--rose); }
 
     @keyframes softGlow {
       0% { text-shadow: 0 0 0 rgba(255,62,138,0); }
       50%{ text-shadow: 0 0 14px rgba(255,62,138,.18); }
       100%{ text-shadow: 0 0 0 rgba(255,62,138,0); }
     }
+    @keyframes ripple {
+      to { transform: translate(-50%,-50%) scale(22); opacity:0; }
+    }
 
-    /* Sección compacta en móviles */
+    /* Resp */
     @media (max-width: 576px){
+      .navbar .navbar-brand{ font-size:.95rem; }
       .hero-sub{ font-size:1rem; }
       .hero-hint{ font-size:.9rem; }
+    }
+
+    /* Accesibilidad motion */
+    @media (prefers-reduced-motion: reduce) {
+      .display-5, .btn-primary:active::after { animation: none !important; }
+      .btn-primary, .navbar .navbar-brand { transition: none !important; }
     }
   </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
 
+  <!-- NAVBAR con logo calculadora centrado -->
   <nav class="navbar navbar-dark shadow-sm">
     <div class="container">
-      <a class="navbar-brand" href="#">
-        <span class="brand-accent">
-          <i class="bi bi-robot"></i>
-          Calculadora IA
-        </span>
+      <a class="navbar-brand" href="#" aria-label="Inicio - Calculadora IA">
+        <!-- SVG LOGO CALCULADORA -->
+        <svg class="logo-calc" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="gRose" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stop-color="#ff3e8a"/>
+              <stop offset="100%" stop-color="#ff69a6"/>
+            </linearGradient>
+          </defs>
+          <!-- cuerpo -->
+          <rect x="6" y="4" rx="8" ry="8" width="36" height="40" class="logo-body"/>
+          <!-- pantalla -->
+          <rect x="11" y="9" rx="4" ry="4" width="26" height="10" class="logo-screen"/>
+          <!-- teclas -->
+          <rect x="12" y="23" width="6" height="6" rx="2" class="logo-key"/>
+          <rect x="20" y="23" width="6" height="6" rx="2" class="logo-key hl"/>
+          <rect x="28" y="23" width="6" height="6" rx="2" class="logo-key"/>
+          <rect x="12" y="31" width="6" height="6" rx="2" class="logo-key"/>
+          <rect x="20" y="31" width="6" height="6" rx="2" class="logo-key"/>
+          <rect x="28" y="31" width="6" height="6" rx="2" class="logo-key"/>
+        </svg>
+        <span>CALCULADORA IA</span>
       </a>
     </div>
   </nav>
@@ -238,7 +284,7 @@
             <div class="d-grid">
               <button id="btnCalcular" class="btn btn-primary btn-lg" type="button">
                 Calcular
-                <i class="bi bi-send ms-1"></i>
+                <i class="bi bi-send ms-1" aria-hidden="true"></i>
               </button>
             </div>
 
@@ -248,7 +294,7 @@
             </div>
 
             <div id="divError" class="alert alert-danger mt-4 mb-0" style="display: none;" role="alert">
-              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              <i class="bi bi-exclamation-triangle-fill me-2" aria-hidden="true"></i>
               <span id="errorTexto">Hubo un error al procesar la solicitud.</span>
             </div>
 
